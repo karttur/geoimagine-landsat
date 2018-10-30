@@ -135,7 +135,7 @@ class ProcessLandsat:
         srcDS,srcLayer = mj_gis.ESRIOpenGetLayer(srcFPN)
         #fieldName = srcLayer.fieldDefL[0].name
         #print ('fieldName', fieldName)
-        #FITTA
+        #ERRORCHECK
         #Loop over the features in the layer
         for feature in srcLayer.layer:
             p = feature.GetField(pathField)
@@ -157,7 +157,7 @@ class ProcessLandsat:
             #add the feature and extract the geom
             geom.GeomFromFeature(feature)
             if srcLayer.geomtype.lower() != 'polygon':
-                BALLE
+                ERRORCHECK
                 exit('_ExtractVectorCoords can nonly have polygon as input')
                 #Insert the centroid of each mgrs zone
                 #query = {'mgrs':mgrs,'utmzone':int(mgrs[0:2]), 'mgrsid':mgrs[2:6],'centerlon':geom.shapelyGeom.x, 'centerlat':geom.shapelyGeom.y}   
@@ -280,13 +280,13 @@ class ProcessLandsat:
                     print (query)
                     if ldir == 'D':
                         if query['ullon'] >= query['urlon']:
-                            BALLE
+                            ERRORCHECK
                         if query['lllon'] >= query['lrlon']:
-                            BALLE  
+                            ERRORCHECK  
                         if query['lllat'] >= query['ullat']:
-                            BALLE
+                            ERRORCHECK
                         if query['lrlat'] >= query['urlat']:
-                            BALLE
+                            ERRORCHECK
 
 
                     self.session._InsertTileCoords(query)
@@ -705,7 +705,7 @@ class ProcessLandsat:
                 return False
             elif startdate > enddate:
                 print (searchD)
-                BALLE
+                ERRORCHECK
             else:
                 return searchD
    
@@ -779,16 +779,16 @@ class ProcessLandsat:
         #if self.process.params.platformname == 'Sentinel-1':    
         if self.process.proj.defregion == 'global':
             if self.process.params.orbitdirection.upper() != 'B':
-                BALLE
+                ERRORCHECK
             if self.process.params.tiles:
                 tileL = self.session._SelectSentinelTiles(self.process.params,self.process.srcperiod,statusD)
                 self._GetTiles(tileL,api)
             else:
                 granuleL = self.session._SelectSentinelGranules(self.process.params,self.process.srcperiod,statusD)
                 self._GetGranules(granuleL,api)
-                BALLE
+                ERRORCHECK
         else:
-            BALLE
+            ERRORCHECK
 
     def _DownloadSentinelTile(self,mgrs):
         '''
@@ -862,7 +862,7 @@ class ProcessLandsat:
                             printstr = 'Moving granule: %(src)s \n    to %(dst)s' %{'src': srcFPN, 'dst':senGranule.FPN}
                             print (printstr)
                             move(srcFPN,senGranule.FPN)
-                            BALLE
+                            ERRORCHECK
     
                 if downFlag:
                     return
@@ -1205,7 +1205,7 @@ class ProcessLandsat:
             subpath = '%(p)s.SAFE' %{'p':subpath}
             granulePath = os.path.join(tempPath,subpath)
             print ('granulepath',granulePath)
-            BALLE
+            ERRORCHECK
             '''
         if os.path.isdir(granulePath):
             return granulePath
@@ -1220,10 +1220,10 @@ class ProcessLandsat:
         statusD['exploded'] = self.process.params.exploded
         if self.process.proj.defregion == 'global':
             if self.process.params.orbitdirection.upper() != 'B':
-                BALLE
+                ERRORCHECK
             tileL = self.session._SelectSentinelTiles(self.process.params,self.process.srcperiod,statusD)
         else:
-            BALLE
+            ERRORCHECK
         for tile in tileL:
             uuid, tileid, source, product, folder, acqdate, orbitid, utm, mgrsid, mgrs  = tile
 
@@ -1235,7 +1235,7 @@ class ProcessLandsat:
                 senTile = self._ConstructTileLayer(tile)
                 if not os.path.exists(senTile.FPN):
                     print (senTile.FPN)
-                    BALLE
+                    ERRORCHECK
                
                 #construct the target, this is now an ordinary compositionprocess
                 compD = {'source':source,'product':product,'folder':'mask','band':'cloudmask','prefix':'cloudmask','suffix':'esa'}
@@ -1548,9 +1548,9 @@ class ProcessLandsat:
                     maskFPN = self._get_mask_shp(srcFPN, dstFPN, union)
                     print ( dstFPN )
                     return maskFPN
-        BALLE
+        ERRORCHECK
         return False
-        BALLE
+        ERRORCHECK
         #maskFN = os.path.split(srcFPN)[1].replace('.gml','.shp')
         #maskFP = os.path.split(dstFP)[0]
         #print 'maskFP',mdstFPN
@@ -1577,7 +1577,7 @@ class ProcessLandsat:
                     print ( srcFPN )
                     return srcFPN 
         return False
-        BALLE
+        ERRORCHECK
         #maskFN = os.path.split(srcFPN)[1].replace('.gml','.shp')
         #maskFP = os.path.split(dstFP)[0]
         #print 'maskFP',mdstFPN
@@ -1726,7 +1726,7 @@ class ProcessLandsat:
                 if filename.endswith(searchtype) and os.path.isfile(os.path.join(root,filename)):
                     srcFPN = os.path.join(root,filename)
                     if self.process.params.tiles:
-                        BALLE
+                        ERRORCHECK
                         tileL = self.session._SelectSentinelTiles(self.process.params,self.process.srcperiod,statusD)
                         self._GetTiles(tileL,api)
                     else:                        
@@ -1750,9 +1750,9 @@ class ProcessLandsat:
                         elif len(granuleL) == 0:
                             granuleidPartsL = granuleid.split('_')
                             print (granuleidPartsL)
-                            BALLE
+                            ERRORCHECK
                         else:
-                            BALLE
+                            ERRORCHECK
 
 
     def _GeoCheckSentinelTilesOld(self):
@@ -1807,7 +1807,7 @@ class ProcessLandsat:
                         queryD['refcols'] = bandR.metadata.cols
                         queryD['reflins'] = bandR.metadata.lins    
                     else:
-                        BALLE
+                        ERRORCHECK
                     #
                     ptL = ( (minx,maxy),(maxx,maxy),(maxx,miny),(minx,miny) )
                     cornergeom = mj_gis.Geometry()
@@ -1843,7 +1843,7 @@ class ProcessLandsat:
                     utm = [(p.x, p.y) for p in utmgeom.shapelyGeom]
                     print ('utm',utm)
                     
-                    BALLE
+                    ERRORCHECK
                     self.session._InsertTileCoords(queryD)
                     '''
                     print ('lins',bandR.metadata.lins)
